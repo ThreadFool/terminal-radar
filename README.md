@@ -1,0 +1,1 @@
+![img](scheme.png)
