@@ -9,4 +9,17 @@ public class AircraftState
 	Integer altitude;
 	Integer speed;
 	Integer heading;
+
+	@Override
+	public String toString()
+	{
+		return "AircraftState{" +
+				"icaoHex='" + icaoHex + '\'' +
+				", callsign='" + callsign + '\'' +
+				", lat=" + latitude +
+				", lon=" + longitude +
+				", alt=" + altitude +
+				", speed=" + speed +
+				", heading=" + heading +
+				'}';	}
 }
