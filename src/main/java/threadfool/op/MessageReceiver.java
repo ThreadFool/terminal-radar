@@ -7,19 +7,21 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MessageReceiver implements Runnable
 {
 
-	Map<String, AircraftState> aircrafts = new ConcurrentHashMap<>();
+	final Map<String, AircraftState> airCrafts;
 
+	public MessageReceiver(Map<String, AircraftState> airCrafts){
+		this.airCrafts = airCrafts;
+	}
 
 	@Override
 	public void run()
 	{
 		String host = "localhost";
-		int port = 30002;
+		int port = 30003;
 
 		try
 		{
@@ -31,7 +33,6 @@ public class MessageReceiver implements Runnable
 			String line;
 			while ((line = reader.readLine()) != null) {
 				handleMessage(line);
-				System.out.println(aircrafts);
 			}
 		}
 		catch (IOException e)
@@ -45,7 +46,7 @@ public class MessageReceiver implements Runnable
 		String type = p[1];
 		String icao = p[4];
 
-		AircraftState a = aircrafts.computeIfAbsent(icao, k -> new AircraftState());
+		AircraftState a = airCrafts.computeIfAbsent(icao, k -> new AircraftState());
 		a.icaoHex = icao;
 
 		switch (type) {
