@@ -21,7 +21,7 @@ public class MessageReceiver implements Runnable
 	public void run()
 	{
 		String host = "localhost";
-		int port = 30003;
+		int port = 30002;
 
 		try
 		{
@@ -55,9 +55,9 @@ public class MessageReceiver implements Runnable
 				break;
 
 			case "3": //position
-				a.latitude  = p[11].isEmpty() ? null : Double.parseDouble(p[11]);
-				a.longitude = p[12].isEmpty() ? null : Double.parseDouble(p[12]);
-				a.altitude  = p[13].isEmpty() ? null : Integer.parseInt(p[13]);
+				a.altitude  = p[11].isEmpty() ? null : Integer.parseInt(p[11]);
+				a.latitude  = p[14].isEmpty() ? null : Double.parseDouble(p[14]);
+				a.longitude = p[15].isEmpty() ? null : Double.parseDouble(p[15]);
 				break;
 
 			case "4": //velocity
