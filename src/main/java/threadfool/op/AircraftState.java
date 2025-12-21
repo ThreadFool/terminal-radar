@@ -9,6 +9,11 @@ public class AircraftState
 	Integer altitude;
 	Integer speed;
 	Integer heading;
+	int tempId;
+
+	public AircraftState(int id){
+		tempId = id;
+	}
 
 	@Override
 	public String toString()

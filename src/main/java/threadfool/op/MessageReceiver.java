@@ -45,8 +45,8 @@ public class MessageReceiver implements Runnable
 		String[] p = line.split(",", -1);
 		String type = p[1];
 		String icao = p[4];
-
-		AircraftState a = airCrafts.computeIfAbsent(icao, k -> new AircraftState());
+		System.out.println(airCrafts.size());
+		AircraftState a = airCrafts.computeIfAbsent(icao, k -> new AircraftState(airCrafts.size()));
 		a.icaoHex = icao;
 
 		switch (type) {

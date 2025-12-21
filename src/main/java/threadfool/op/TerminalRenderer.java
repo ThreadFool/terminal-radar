@@ -73,7 +73,7 @@ public class TerminalRenderer implements Runnable
 			int y = (int)(center - dyKm / kmPerCell);
 
 			if (x > 0 && x < max && y > 0 && y < max)
-				grid[y][x] = '*';
+				grid[y][x] = (char) ('0' + a.tempId);
 		}
 
 		for (char[] row : grid)
