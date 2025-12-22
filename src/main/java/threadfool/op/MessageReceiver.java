@@ -7,11 +7,13 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MessageReceiver implements Runnable
 {
 
 	final Map<String, AircraftState> airCrafts;
+	private final AtomicInteger nextId = new AtomicInteger();
 
 	public MessageReceiver(Map<String, AircraftState> airCrafts){
 		this.airCrafts = airCrafts;
@@ -21,7 +23,7 @@ public class MessageReceiver implements Runnable
 	public void run()
 	{
 		String host = "localhost";
-		int port = 30003;
+		int port = 30002;
 
 		try
 		{
@@ -42,27 +44,46 @@ public class MessageReceiver implements Runnable
 	}
 
 	void handleMessage(String line) {
+
+		if (line == null || line.isBlank()) return;
+
 		String[] p = line.split(",", -1);
+
+		if (p.length < 5 || !"MSG".equals(p[0])) return;
+
 		String type = p[1];
 		String icao = p[4];
-		AircraftState a = airCrafts.computeIfAbsent(icao, k -> new AircraftState(airCrafts.size()));
+
+		AircraftState a = airCrafts.computeIfAbsent(
+				icao, k -> new AircraftState(nextId.getAndIncrement())
+		);
 		a.icaoHex = icao;
 
 		switch (type) {
-			case "1": //callsign
-				a.callsign = p[10].trim();
-				break;
+			case "1" -> a.callsign = field(p, 10);
 
-			case "3": //position
-				a.altitude  = p[11].isEmpty() ? null : Integer.parseInt(p[11]);
-				a.latitude  = p[14].isEmpty() ? null : Double.parseDouble(p[14]);
-				a.longitude = p[15].isEmpty() ? null : Double.parseDouble(p[15]);
-				break;
+			case "3" -> {
+				a.altitude  = parseInt(field(p, 11));
+				a.latitude  = parseDouble(field(p, 14));
+				a.longitude = parseDouble(field(p, 15));
+			}
 
-			case "4": //velocity
-				a.speed   = p[12].isEmpty() ? null : Integer.parseInt(p[12]);
-				a.heading = p[13].isEmpty() ? null : Integer.parseInt(p[13]);
-				break;
+			case "4" -> {
+				a.speed   = parseInt(field(p, 12));
+				a.heading = parseInt(field(p, 13));
+			}
 		}
+	}
+
+	Integer parseInt(String s) {
+		return s != null ? Integer.parseInt(s) : null;
+	}
+
+	Double parseDouble(String s) {
+		return s != null ? Double.parseDouble(s) : null;
+	}
+
+	private static String field(String[] p, int idx) {
+		return idx < p.length && !p[idx].isEmpty() ? p[idx] : null;
 	}
 }
