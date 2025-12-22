@@ -23,7 +23,7 @@ public class MessageReceiver implements Runnable
 	public void run()
 	{
 		String host = "localhost";
-		int port = 30002;
+		int port = 30003;
 
 		try
 		{
