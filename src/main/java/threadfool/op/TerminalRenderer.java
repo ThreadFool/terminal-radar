@@ -1,6 +1,8 @@
 package threadfool.op;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class TerminalRenderer implements Runnable
@@ -9,7 +11,7 @@ public class TerminalRenderer implements Runnable
 	private static final int SIZE = 40;
 	static final double MY_LAT = 50.2945;
 	static final double MY_LON = 18.6714;
-	static final double RANGE_KM = 200;
+	static final double RANGE_KM = 100;
 
 	public TerminalRenderer(Map<String, AircraftState> airCrafts)
 	{
@@ -19,33 +21,42 @@ public class TerminalRenderer implements Runnable
 	@Override
 	public void run()
 	{
-		while (true) {
+		while (true)
+		{
 			clearScreen();
 			drawMap();
 
-			try {
+			try
+			{
 				Thread.sleep(1000);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				Thread.currentThread().interrupt();
 				return;
 			}
 		}
 	}
 
-	private void drawMap() {
+	private void drawMap()
+	{
 		char[][] grid = new char[SIZE][SIZE];
 
 		for (char[] row : grid)
+		{
 			Arrays.fill(row, ' ');
+		}
 
 		int max = SIZE - 1;
 
-		for (int x = 0; x < SIZE; x++) {
+		for (int x = 0; x < SIZE; x++)
+		{
 			grid[0][x] = '-';
 			grid[max][x] = '-';
 		}
 
-		for (int y = 0; y < SIZE; y++) {
+		for (int y = 0; y < SIZE; y++)
+		{
 			grid[y][0] = '|';
 			grid[y][max] = '|';
 		}
@@ -62,38 +73,53 @@ public class TerminalRenderer implements Runnable
 		double kmPerDegLon = 111.0 * Math.cos(Math.toRadians(MY_LAT));
 		double kmPerCell = RANGE_KM / (SIZE / 2.0);
 
-		for (AircraftState a : airCrafts.values()) {
+		for (AircraftState a : airCrafts.values())
+		{
 			if (a.latitude == null || a.longitude == null)
+			{
 				continue;
+			}
 
 			double dxKm = (a.longitude - MY_LON) * kmPerDegLon;
-			double dyKm = (a.latitude  - MY_LAT) * kmPerDegLat;
+			double dyKm = (a.latitude - MY_LAT) * kmPerDegLat;
 
-			int x = (int)(center + dxKm / kmPerCell);
-			int y = (int)(center - dyKm / kmPerCell);
+			int x = (int) (center + dxKm / kmPerCell);
+			int y = (int) (center - dyKm / kmPerCell);
 
 			if (x > 0 && x < max && y > 0 && y < max)
+			{
 				grid[y][x] = (char) ('0' + a.tempId);
+			}
 		}
 
-		for (char[] row : grid)
-			System.out.println(row);
+		List<AircraftState> visible = new ArrayList<>(airCrafts.values());
+
+		for (int y = 0; y < SIZE; y++)
+		{
+			String mapRow = new String(grid[y]);
+
+			String info = "";
+			if (y < visible.size())
+			{
+				AircraftState a = visible.get(y);
+				String hdg = a.heading != null ? String.format("%3d°", a.heading) : " ---";
+
+				info = String.format("  %2d  %6dm  %4s  %7.4f  %8.4f  %s",//
+						a.tempId, //
+						a.altitude != null ? a.altitude : 0, //
+						hdg, //
+						a.latitude, //
+						a.longitude, //
+						a.icaoHex //
+				);
+			}
+
+			System.out.println(mapRow + info);
+		}
 	}
 
-	static double distanceKm(double lat1, double lon1, double lat2, double lon2) {
-		double R = 6371.0;
-		double dLat = Math.toRadians(lat2 - lat1);
-		double dLon = Math.toRadians(lon2 - lon1);
-
-		double a = Math.sin(dLat/2)*Math.sin(dLat/2)
-				+ Math.cos(Math.toRadians(lat1))
-				* Math.cos(Math.toRadians(lat2))
-				* Math.sin(dLon/2)*Math.sin(dLon/2);
-
-		return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	}
-
-	private void clearScreen() {
+	private void clearScreen()
+	{
 		System.out.print("\033[H\033[2J");
 		System.out.flush();
 	}
