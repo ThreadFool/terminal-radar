@@ -1,5 +1,7 @@
 package threadfool.op;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -107,14 +109,23 @@ public class TerminalRenderer implements Runnable
 				AircraftState a = visible.get(y);
 				String hdg = a.heading != null ? String.format("%3d°", a.heading) : " ---";
 
-				info = String.format("  %2d  %6dm  %4s  %7.4f  %8.4f  %s",//
+				info = String.format("  %2d  %6dm  %4s  %7.4f  %8.4f  %s  %s",//
 						a.tempId, //
 						a.altitude != null ? a.altitude : 0, //
 						hdg, //
 						a.latitude, //
 						a.longitude, //
-						a.icaoHex //
+						a.icaoHex, //
+						a.lastSeen
 				);
+
+				if(a.lastSeen!=null)
+				{
+					if (Duration.between(a.lastSeen, Instant.now()).toMinutes() >= 10)
+					{
+						airCrafts.remove(a.icaoHex);
+					}
+				}
 			}
 
 			System.out.println(mapRow + info);

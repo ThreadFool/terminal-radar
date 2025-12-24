@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -15,7 +16,8 @@ public class MessageReceiver implements Runnable
 	final Map<String, AircraftState> airCrafts;
 	private final AtomicInteger nextId = new AtomicInteger();
 
-	public MessageReceiver(Map<String, AircraftState> airCrafts){
+	public MessageReceiver(Map<String, AircraftState> airCrafts)
+	{
 		this.airCrafts = airCrafts;
 	}
 
@@ -33,7 +35,8 @@ public class MessageReceiver implements Runnable
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
 			String line;
-			while ((line = reader.readLine()) != null) {
+			while ((line = reader.readLine()) != null)
+			{
 				handleMessage(line);
 			}
 		}
@@ -43,47 +46,62 @@ public class MessageReceiver implements Runnable
 		}
 	}
 
-	void handleMessage(String line) {
+	void handleMessage(String line)
+	{
 
-		if (line == null || line.isBlank()) return;
+		if (line == null || line.isBlank())
+		{
+			return;
+		}
 
 		String[] p = line.split(",", -1);
 
-		if (p.length < 5 || !"MSG".equals(p[0])) return;
+		if (p.length < 5 || !"MSG".equals(p[0]))
+		{
+			return;
+		}
 
 		String type = p[1];
 		String icao = p[4];
 
-		AircraftState a = airCrafts.computeIfAbsent(
-				icao, k -> new AircraftState(nextId.getAndIncrement())
-		);
+		AircraftState a = airCrafts.computeIfAbsent(icao, k -> new AircraftState(nextId.getAndIncrement()));
 		a.icaoHex = icao;
 
-		switch (type) {
-			case "1" -> a.callsign = field(p, 10);
+		switch (type)
+		{
+			case "1" ->
+			{
+				a.callsign = field(p, 10);
+				a.lastSeen = LocalDateTime.now();
+			}
 
-			case "3" -> {
-				a.altitude  = parseInt(field(p, 11));
-				a.latitude  = parseDouble(field(p, 14));
+			case "3" ->
+			{
+				a.altitude = parseInt(field(p, 11));
+				a.latitude = parseDouble(field(p, 14));
 				a.longitude = parseDouble(field(p, 15));
 			}
 
-			case "4" -> {
-				a.speed   = parseInt(field(p, 12));
+			case "4" ->
+			{
+				a.speed = parseInt(field(p, 12));
 				a.heading = parseInt(field(p, 13));
 			}
 		}
 	}
 
-	Integer parseInt(String s) {
+	Integer parseInt(String s)
+	{
 		return s != null ? Integer.parseInt(s) : null;
 	}
 
-	Double parseDouble(String s) {
+	Double parseDouble(String s)
+	{
 		return s != null ? Double.parseDouble(s) : null;
 	}
 
-	private static String field(String[] p, int idx) {
+	private static String field(String[] p, int idx)
+	{
 		return idx < p.length && !p[idx].isEmpty() ? p[idx] : null;
 	}
 }

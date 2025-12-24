@@ -1,5 +1,7 @@
 package threadfool.op;
 
+import java.time.LocalDateTime;
+
 public class AircraftState
 {
 	String icaoHex;
@@ -9,6 +11,7 @@ public class AircraftState
 	Integer altitude;
 	Integer speed;
 	Integer heading;
+	LocalDateTime lastSeen;
 	int tempId;
 
 	public AircraftState(int id){
