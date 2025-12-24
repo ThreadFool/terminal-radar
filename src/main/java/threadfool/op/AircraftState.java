@@ -1,6 +1,6 @@
 package threadfool.op;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class AircraftState
 {
@@ -11,7 +11,7 @@ public class AircraftState
 	Integer altitude;
 	Integer speed;
 	Integer heading;
-	LocalDateTime lastSeen;
+	Instant lastSeen;
 	int tempId;
 
 	public AircraftState(int id){

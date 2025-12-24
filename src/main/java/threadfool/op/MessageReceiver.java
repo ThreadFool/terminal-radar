@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -72,7 +73,7 @@ public class MessageReceiver implements Runnable
 			case "1" ->
 			{
 				a.callsign = field(p, 10);
-				a.lastSeen = LocalDateTime.now();
+				a.lastSeen = Instant.now();
 			}
 
 			case "3" ->
