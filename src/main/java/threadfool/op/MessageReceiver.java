@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,7 +25,7 @@ public class MessageReceiver implements Runnable
 	public void run()
 	{
 		String host = "localhost";
-		int port = 30002;
+		int port = 30003;
 
 		try
 		{
