@@ -26,7 +26,7 @@ public class MessageReceiver implements Runnable
 	public void run()
 	{
 		String host = "localhost";
-		int port = 30003;
+		int port = 30002;
 
 		try
 		{
@@ -67,13 +67,13 @@ public class MessageReceiver implements Runnable
 
 		AircraftState a = airCrafts.computeIfAbsent(icao, k -> new AircraftState(nextId.getAndIncrement()));
 		a.icaoHex = icao;
+		a.lastSeen = Instant.now();
 
 		switch (type)
 		{
 			case "1" ->
 			{
 				a.callsign = field(p, 10);
-				a.lastSeen = Instant.now();
 			}
 
 			case "3" ->
@@ -81,14 +81,12 @@ public class MessageReceiver implements Runnable
 				a.altitude = parseInt(field(p, 11));
 				a.latitude = parseDouble(field(p, 14));
 				a.longitude = parseDouble(field(p, 15));
-				a.lastSeen = Instant.now();
 			}
 
 			case "4" ->
 			{
 				a.speed = parseInt(field(p, 12));
 				a.heading = parseInt(field(p, 13));
-				a.lastSeen = Instant.now();
 			}
 		}
 	}
