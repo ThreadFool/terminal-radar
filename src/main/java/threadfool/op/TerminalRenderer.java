@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TerminalRenderer implements Runnable
 {
@@ -14,13 +15,14 @@ public class TerminalRenderer implements Runnable
 	final double MY_LAT;
 	final double MY_LON;
 	static final double RANGE_KM = 100;
+	private final ConcurrentLinkedQueue<Integer> freeIds;
 
-	public TerminalRenderer(Map<String, AircraftState> airCrafts, Configuration configuration)
+	public TerminalRenderer(Map<String, AircraftState> airCrafts, Configuration configuration, ConcurrentLinkedQueue<Integer> freeIds)
 	{
 		this.airCrafts = airCrafts;
 		this.MY_LAT = configuration.getLatitude();
 		this.MY_LON = configuration.getLongitude();
-
+		this.freeIds = freeIds;
 	}
 
 	@Override
@@ -124,6 +126,7 @@ public class TerminalRenderer implements Runnable
 					if (Duration.between(a.lastSeen, Instant.now()).toMinutes() >= 10)
 					{
 						airCrafts.remove(a.icaoHex);
+						freeIds.offer(a.tempId);
 					}
 				}
 			}

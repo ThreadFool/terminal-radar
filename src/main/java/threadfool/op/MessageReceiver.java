@@ -8,17 +8,19 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MessageReceiver implements Runnable
 {
-
 	final Map<String, AircraftState> airCrafts;
 	private final AtomicInteger nextId = new AtomicInteger();
+	private final ConcurrentLinkedQueue<Integer> freeIds;
 
-	public MessageReceiver(Map<String, AircraftState> airCrafts)
+	public MessageReceiver(Map<String, AircraftState> airCrafts, ConcurrentLinkedQueue<Integer> freeIds)
 	{
 		this.airCrafts = airCrafts;
+		this.freeIds = freeIds;
 	}
 
 	@Override
@@ -64,8 +66,13 @@ public class MessageReceiver implements Runnable
 		String type = p[1];
 		String icao = p[4];
 
-		AircraftState a = airCrafts.computeIfAbsent(icao, k -> new AircraftState(nextId.getAndIncrement()));
-		a.icaoHex = icao;
+		AircraftState a = airCrafts.computeIfAbsent(icao, k -> {
+			Integer id = freeIds.poll();
+			if (id == null) {
+				id = nextId.getAndIncrement();
+			}
+			return new AircraftState(id);
+		});		a.icaoHex = icao;
 		a.lastSeen = Instant.now();
 
 		switch (type)
