@@ -81,12 +81,14 @@ public class MessageReceiver implements Runnable
 				a.altitude = parseInt(field(p, 11));
 				a.latitude = parseDouble(field(p, 14));
 				a.longitude = parseDouble(field(p, 15));
+				a.lastSeen = Instant.now();
 			}
 
 			case "4" ->
 			{
 				a.speed = parseInt(field(p, 12));
 				a.heading = parseInt(field(p, 13));
+				a.lastSeen = Instant.now();
 			}
 		}
 	}
