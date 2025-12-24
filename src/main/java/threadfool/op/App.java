@@ -7,11 +7,11 @@ public class App
 {
 	public static void main(String[] args)
 	{
-
+		Configuration configuration = new Configuration();
 		Map<String, AircraftState> aircrafts = new ConcurrentHashMap<>();
 
 		MessageReceiver messageReceiver = new MessageReceiver(aircrafts);
-		TerminalRenderer terminalRenderer = new TerminalRenderer(aircrafts);
+		TerminalRenderer terminalRenderer = new TerminalRenderer(aircrafts, configuration);
 
 		Thread recieverThread = new Thread(messageReceiver);
 		Thread terminalRendererThread = new Thread(terminalRenderer);

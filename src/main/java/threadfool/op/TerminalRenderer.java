@@ -9,13 +9,16 @@ public class TerminalRenderer implements Runnable
 {
 	final Map<String, AircraftState> airCrafts;
 	private static final int SIZE = 40;
-	static final double MY_LAT = 50.2945;
-	static final double MY_LON = 18.6714;
+	final double MY_LAT;
+	final double MY_LON;
 	static final double RANGE_KM = 100;
 
-	public TerminalRenderer(Map<String, AircraftState> airCrafts)
+	public TerminalRenderer(Map<String, AircraftState> airCrafts, Configuration configuration)
 	{
 		this.airCrafts = airCrafts;
+		this.MY_LAT = configuration.getLatitude();
+		this.MY_LON = configuration.getLongitude();
+
 	}
 
 	@Override
