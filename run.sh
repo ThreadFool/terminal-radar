@@ -1,0 +1,1 @@
+ java -jar build/libs/terminal-radar-1.0-SNAPSHOT.jar
