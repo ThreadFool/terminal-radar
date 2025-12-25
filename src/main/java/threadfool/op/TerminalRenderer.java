@@ -17,7 +17,8 @@ public class TerminalRenderer implements Runnable
 	static final double RANGE_KM = 100;
 	private final ConcurrentLinkedQueue<Integer> freeIds;
 
-	public TerminalRenderer(Map<String, AircraftState> airCrafts, Configuration configuration, ConcurrentLinkedQueue<Integer> freeIds)
+	public TerminalRenderer(Map<String, AircraftState> airCrafts, Configuration configuration,
+			ConcurrentLinkedQueue<Integer> freeIds)
 	{
 		this.airCrafts = airCrafts;
 		this.MY_LAT = configuration.getLatitude();
@@ -111,17 +112,18 @@ public class TerminalRenderer implements Runnable
 				AircraftState a = visible.get(y);
 				String hdg = a.heading != null ? String.format("%3d°", a.heading) : " ---";
 
-				info = String.format("  %2d  %6dm  %4s  %7.4f  %8.4f  %s  %s",//
+				info = String.format("  %2d  %6dm  %4s  %7.4f  %8.4f  %s  %s  %s",//
 						a.tempId, //
 						a.altitude != null ? a.altitude : 0, //
 						hdg, //
 						a.latitude, //
 						a.longitude, //
+						Utils.toHms(a.lastSeen), //
 						a.icaoHex, //
-						a.lastSeen
+						a.callsign //
 				);
 
-				if(a.lastSeen!=null)
+				if (a.lastSeen != null)
 				{
 					if (Duration.between(a.lastSeen, Instant.now()).toMinutes() >= 10)
 					{
