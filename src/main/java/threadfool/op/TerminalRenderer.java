@@ -112,7 +112,7 @@ public class TerminalRenderer implements Runnable
 				AircraftState a = visible.get(y);
 				String hdg = a.heading != null ? String.format("%3d°", a.heading) : " ---";
 
-				info = String.format("  %2d  %6dm  %4s  %7.4f  %8.4f  %s  %s  %s",//
+				info = String.format("  %2d  %6dft  %4s  %7.4f  %8.4f  %s  %s  %s",//
 						a.tempId, //
 						a.altitude != null ? a.altitude : 0, //
 						hdg, //
