@@ -12,7 +12,7 @@ public class App
 		ConcurrentLinkedQueue<Integer> freeIds = new ConcurrentLinkedQueue<>();
 		Map<String, AircraftState> aircrafts = new ConcurrentHashMap<>();
 
-		MessageReceiver messageReceiver = new MessageReceiver(aircrafts, freeIds);
+		MessageReceiver messageReceiver = new MessageReceiver(aircrafts, freeIds, configuration);
 		TerminalRenderer terminalRenderer = new TerminalRenderer(aircrafts, configuration, freeIds);
 
 		Thread recieverThread = new Thread(messageReceiver);

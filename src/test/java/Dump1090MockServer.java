@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Dump1090MockServer {
 
-	private static final int PORT = 30002;
+	private static final int PORT = 30003;
 
 	private static final List<String> MESSAGES = List.of(
 			"MSG,3,1,1,4BAA56,1,2025/12/20,14:31:16.243,2025/12/20,14:31:16.285,,33000,,,50.17238,18.38785,,,0,,0,0",

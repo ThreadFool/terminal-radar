@@ -13,22 +13,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MessageReceiver implements Runnable
 {
-	final Map<String, AircraftState> airCrafts;
+	private final Map<String, AircraftState> airCrafts;
 	private final AtomicInteger nextId = new AtomicInteger();
 	private final ConcurrentLinkedQueue<Integer> freeIds;
+	private final String host;
+	private final int port;
 
-	public MessageReceiver(Map<String, AircraftState> airCrafts, ConcurrentLinkedQueue<Integer> freeIds)
+	public MessageReceiver(Map<String, AircraftState> airCrafts, ConcurrentLinkedQueue<Integer> freeIds, Configuration configuration)
 	{
 		this.airCrafts = airCrafts;
 		this.freeIds = freeIds;
+		this.host = configuration.getHost();
+		this.port = configuration.getPort();
 	}
 
 	@Override
 	public void run()
 	{
-		String host = "localhost";
-		int port = 30003;
-
 		try
 		{
 			Socket socket = new Socket(host, port);
