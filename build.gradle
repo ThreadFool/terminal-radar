@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation("com.h2database:h2:2.4.240")
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
@@ -23,5 +25,11 @@ jar {
         attributes(
                 'Main-Class': 'threadfool.op.App'
         )
+    }
+
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
     }
 }
