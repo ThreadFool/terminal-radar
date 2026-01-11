@@ -12,7 +12,7 @@ public class App
 {
 	public static void main(String[] args)
 	{
-		String url = "jdbc:h2:./data/adsbdb";
+		String url = "jdbc:h2:./data/database(lol)";
 		String user = "sa";
 		String pass = "";
 
