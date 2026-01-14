@@ -12,7 +12,27 @@ public class App
 {
 	public static void main(String[] args)
 	{
-		String url = "jdbc:h2:./data/database(lol)";
+		Configuration configuration = new Configuration();
+
+		if(!configuration.getSearchedAircraft().equals("none")){
+			createAircraftTable();
+		}
+
+		ConcurrentLinkedQueue<Integer> freeIds = new ConcurrentLinkedQueue<>();
+		Map<String, AircraftState> aircrafts = new ConcurrentHashMap<>();
+
+		MessageReceiver messageReceiver = new MessageReceiver(aircrafts, freeIds, configuration);
+		TerminalRenderer terminalRenderer = new TerminalRenderer(aircrafts, configuration, freeIds);
+
+		Thread recieverThread = new Thread(messageReceiver);
+		Thread terminalRendererThread = new Thread(terminalRenderer);
+
+		recieverThread.start();
+		terminalRendererThread.start();
+	}
+
+	private static void createAircraftTable(){
+		String url = "jdbc:h2:./data/aircraftdatabase";
 		String user = "sa";
 		String pass = "";
 
@@ -27,30 +47,10 @@ public class App
                     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """);
-
-			stmt.execute("""
-                INSERT INTO flight (icao24, callsign)
-                VALUES ('48a123', 'LOT123')
-            """);
-
-			System.out.println("Worked");
 		}
 		catch (SQLException e)
 		{
 			throw new RuntimeException(e);
 		}
-
-		Configuration configuration = new Configuration();
-		ConcurrentLinkedQueue<Integer> freeIds = new ConcurrentLinkedQueue<>();
-		Map<String, AircraftState> aircrafts = new ConcurrentHashMap<>();
-
-		MessageReceiver messageReceiver = new MessageReceiver(aircrafts, freeIds, configuration);
-		TerminalRenderer terminalRenderer = new TerminalRenderer(aircrafts, configuration, freeIds);
-
-		Thread recieverThread = new Thread(messageReceiver);
-		Thread terminalRendererThread = new Thread(terminalRenderer);
-
-		recieverThread.start();
-		terminalRendererThread.start();
 	}
 }

@@ -6,6 +6,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -51,7 +55,6 @@ public class MessageReceiver implements Runnable
 
 	void handleMessage(String line)
 	{
-
 		if (line == null || line.isBlank())
 		{
 			return;
