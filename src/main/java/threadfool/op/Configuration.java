@@ -14,7 +14,7 @@ public class Configuration
 		this.longitude = Double.parseDouble(System.getenv("MY_LONG"));
 		this.host = System.getenv().getOrDefault("HOST", "localhost");
 		this.port = Integer.parseInt(System.getenv().getOrDefault("PORT", String.valueOf(30003)));
-		this. searchedAircraft = System.getenv().getOrDefault("TRACING_CALLSIGN", "none");
+		this.searchedAircraft = System.getenv().getOrDefault("TRACING_CALLSIGN", "none");
 	}
 
 	public double getLatitude()

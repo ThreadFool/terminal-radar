@@ -6,12 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,7 +20,7 @@ public class MessageReceiver implements Runnable
 	private final String host;
 	private final int port;
 
-	public MessageReceiver(Map<String, AircraftState> airCrafts, ConcurrentLinkedQueue<Integer> freeIds, Configuration configuration)
+	public MessageReceiver(Map<String, AircraftState> airCrafts, ConcurrentLinkedQueue<Integer> freeIds, Configuration configuration, BlockingQueue<AircraftSnapshot> aircraftSnapshots)
 	{
 		this.airCrafts = airCrafts;
 		this.freeIds = freeIds;
