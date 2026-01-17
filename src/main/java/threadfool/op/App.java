@@ -29,11 +29,21 @@ public class App
 		TerminalRenderer terminalRenderer = new TerminalRenderer(aircrafts, configuration, freeIds);
 		DbWriter dbWriter = new DbWriter(dbQueue);
 
+		Thread dbWriterThread = new Thread(dbWriter);
 		Thread recieverThread = new Thread(messageReceiver);
 		Thread terminalRendererThread = new Thread(terminalRenderer);
 
+		dbWriterThread.start();
 		recieverThread.start();
 		terminalRendererThread.start();
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			System.out.println("Shutting down database writer...");
+			dbWriter.shutdown();
+			try {
+				dbWriterThread.join();
+			} catch (InterruptedException ignored) {}
+		}));
 	}
 
 	private static void createAircraftTable()

@@ -19,6 +19,8 @@ public class MessageReceiver implements Runnable
 	private final ConcurrentLinkedQueue<Integer> freeIds;
 	private final String host;
 	private final int port;
+	private final BlockingQueue<AircraftSnapshot> aircraftSnapshots;
+	private final String searchedIcao;
 
 	public MessageReceiver(Map<String, AircraftState> airCrafts, ConcurrentLinkedQueue<Integer> freeIds, Configuration configuration, BlockingQueue<AircraftSnapshot> aircraftSnapshots)
 	{
@@ -26,6 +28,8 @@ public class MessageReceiver implements Runnable
 		this.freeIds = freeIds;
 		this.host = configuration.getHost();
 		this.port = configuration.getPort();
+		this.aircraftSnapshots = aircraftSnapshots;
+		this.searchedIcao = configuration.getSearchedAircraft();
 	}
 
 	@Override
@@ -76,6 +80,7 @@ public class MessageReceiver implements Runnable
 		});		a.icaoHex = icao;
 		a.lastSeen = Instant.now();
 
+
 		switch (type)
 		{
 			case "1" ->
@@ -96,6 +101,7 @@ public class MessageReceiver implements Runnable
 				a.heading = parseInt(field(p, 13));
 			}
 		}
+		//aircraftSnapshots.offer()
 	}
 
 	Integer parseInt(String s)
