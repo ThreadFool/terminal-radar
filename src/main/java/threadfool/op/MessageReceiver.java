@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,13 +19,17 @@ public class MessageReceiver implements Runnable
 	private final ConcurrentLinkedQueue<Integer> freeIds;
 	private final String host;
 	private final int port;
+	private final BlockingQueue<AircraftSnapshot> aircraftSnapshots;
+	private final String searchedCallsign;
 
-	public MessageReceiver(Map<String, AircraftState> airCrafts, ConcurrentLinkedQueue<Integer> freeIds, Configuration configuration)
+	public MessageReceiver(Map<String, AircraftState> airCrafts, ConcurrentLinkedQueue<Integer> freeIds, Configuration configuration, BlockingQueue<AircraftSnapshot> aircraftSnapshots)
 	{
 		this.airCrafts = airCrafts;
 		this.freeIds = freeIds;
 		this.host = configuration.getHost();
 		this.port = configuration.getPort();
+		this.aircraftSnapshots = aircraftSnapshots;
+		this.searchedCallsign = configuration.getSearchedAircraft();
 	}
 
 	@Override
@@ -51,7 +56,6 @@ public class MessageReceiver implements Runnable
 
 	void handleMessage(String line)
 	{
-
 		if (line == null || line.isBlank())
 		{
 			return;
@@ -76,26 +80,33 @@ public class MessageReceiver implements Runnable
 		});		a.icaoHex = icao;
 		a.lastSeen = Instant.now();
 
-		switch (type)
-		{
-			case "1" ->
+			switch (type)
 			{
-				a.callsign = field(p, 10);
-			}
+				case "1" ->
+				{
+					a.callsign = field(p, 10);
+				}
 
-			case "3" ->
-			{
-				a.altitude = parseInt(field(p, 11));
-				a.latitude = parseDouble(field(p, 14));
-				a.longitude = parseDouble(field(p, 15));
-			}
+				case "3" ->
+				{
+					a.altitude = parseInt(field(p, 11));
+					a.latitude = parseDouble(field(p, 14));
+					a.longitude = parseDouble(field(p, 15));
 
-			case "4" ->
-			{
-				a.speed = parseInt(field(p, 12));
-				a.heading = parseInt(field(p, 13));
+					if (a.hasPosition()
+							&& a.icaoHex != null
+							&& a.icaoHex.equals(searchedCallsign))
+					{
+						aircraftSnapshots.offer(a.toSnapshot());
+					}
+				}
+
+				case "4" ->
+				{
+					a.speed = parseInt(field(p, 12));
+					a.heading = parseInt(field(p, 13));
+				}
 			}
-		}
 	}
 
 	Integer parseInt(String s)
