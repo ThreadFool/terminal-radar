@@ -42,7 +42,6 @@ public class DbWriter implements Runnable
 			while (running || !queue.isEmpty())
 			{
 				AircraftSnapshot s = queue.poll(200, TimeUnit.MILLISECONDS);
-				System.out.println("KUUURWA" + queue.size());
 				if (s != null)
 				{
 					batch.add(s);

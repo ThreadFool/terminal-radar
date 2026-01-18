@@ -33,7 +33,10 @@ public class App
 		Thread recieverThread = new Thread(messageReceiver);
 		Thread terminalRendererThread = new Thread(terminalRenderer);
 
-		dbWriterThread.start();
+		if (!configuration.getSearchedAircraft().equals("none"))
+		{
+			dbWriterThread.start();
+		}
 		recieverThread.start();
 		terminalRendererThread.start();
 
