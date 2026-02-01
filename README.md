@@ -23,6 +23,11 @@ export MY_LAT=50.000
 export MY_LONG=20.000
 ```
 
+If you want to track specific flight and save its data to h2 database file just set:
+```bash
+export TRACING_CALLSIGN = (callsing of the flight you want to track)
+```
+
 Run the app:
 ```bash
 ./run.sh
