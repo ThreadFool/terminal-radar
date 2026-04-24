@@ -6,6 +6,7 @@ public class Configuration
 	private final double longitude;
 	private final String host;
 	private final int port;
+	private final String searchedAircraft;
 
 	public Configuration()
 	{
@@ -13,6 +14,7 @@ public class Configuration
 		this.longitude = Double.parseDouble(System.getenv("MY_LONG"));
 		this.host = System.getenv().getOrDefault("HOST", "localhost");
 		this.port = Integer.parseInt(System.getenv().getOrDefault("PORT", String.valueOf(30003)));
+		this.searchedAircraft = System.getenv().getOrDefault("TRACING_CALLSIGN", "none");
 	}
 
 	public double getLatitude()
@@ -33,5 +35,10 @@ public class Configuration
 	public int getPort()
 	{
 		return port;
+	}
+
+	public String getSearchedAircraft()
+	{
+		return searchedAircraft;
 	}
 }

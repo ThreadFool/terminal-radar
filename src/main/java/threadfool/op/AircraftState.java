@@ -18,6 +18,21 @@ public class AircraftState
 		tempId = id;
 	}
 
+	boolean hasPosition() {
+		return latitude != null && longitude != null;
+	}
+
+	AircraftSnapshot toSnapshot() {
+		return new AircraftSnapshot(
+				icaoHex,
+				callsign,
+				latitude,
+				longitude,
+				altitude,
+				Instant.now()
+		);
+	}
+
 	@Override
 	public String toString()
 	{
