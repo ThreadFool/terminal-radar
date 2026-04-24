@@ -13,6 +13,8 @@ public class AircraftState
 	Integer heading;
 	Instant lastSeen;
 	int tempId;
+	double  lastRevealedAngle = -1;   // bearing (0=N, CW) when sweep last passed; -1 = never seen
+	Instant lastRevealTime    = null; // wall-clock time of last sweep reveal
 
 	public AircraftState(int id){
 		tempId = id;
