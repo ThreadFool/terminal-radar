@@ -18,7 +18,6 @@ public class TerminalRenderer implements Runnable
 	private final ConcurrentLinkedQueue<Integer> freeIds;
 
 	private static final int FALLBACK_SIZE  = 40;
-	private static final int SIDEBAR_WIDTH  = 52;
 	private static final String ANSI_RESET  = "\033[0m";
 	private static final String ANSI_CYAN   = "\033[96m";   // low  < 10,000 ft
 	private static final String ANSI_YELLOW = "\033[93m";   // mid  10,000–25,000 ft
@@ -108,10 +107,21 @@ public class TerminalRenderer implements Runnable
 		int max    = size - 1;
 		int center = size / 2;
 
-		// Border
-		for (int x = 0; x < size; x++) { grid[0][x] = '-'; grid[max][x] = '-'; }
-		for (int y = 0; y < size; y++) { grid[y][0] = '|'; grid[y][max] = '|'; }
-		grid[0][0] = '+'; grid[0][max] = '+'; grid[max][0] = '+'; grid[max][max] = '+';
+		// Circular border — scale dx by 0.5 to compensate for terminal character aspect ratio
+		// (cells are ~2× taller than wide, so unscaled circles render as tall ellipses)
+		final double ASPECT = 0.5;
+		double radius = center - 0.5;
+		for (int y = 0; y < size; y++)
+		{
+			for (int x = 0; x < size; x++)
+			{
+				double dy   = y - center;
+				double dx   = (x - center) * ASPECT;
+				double dist = Math.sqrt(dx * dx + dy * dy);
+				if (dist >= radius - 0.7 && dist <= radius + 0.7)
+					grid[y][x] = '.';
+			}
+		}
 		grid[center][center] = '+';
 
 		// Draw trailing sweep lines: intensity 5 at tip, decreasing into the tail
@@ -189,12 +199,10 @@ public class TerminalRenderer implements Runnable
 
 				if (intensity > 0 && color != null)
 				{
-					// Aircraft on sweep: altitude color wins, no green overlay
 					mapRow.append(color).append(grid[y][x]).append(ANSI_RESET);
 				}
 				else if (intensity > 0)
 				{
-					// Empty sweep cell: green beam character
 					mapRow.append(SWEEP_COLORS[intensity]).append('|').append(ANSI_RESET);
 				}
 				else if (color != null)
@@ -207,34 +215,17 @@ public class TerminalRenderer implements Runnable
 				}
 			}
 
-			String info = "";
-			if (y < visible.size())
+			System.out.println(mapRow);
+		}
+
+		// Expire old aircraft (moved here from DataWriter to keep shared state consistent)
+		for (AircraftState a : new ArrayList<>(airCrafts.values()))
+		{
+			if (a.lastSeen != null && Duration.between(a.lastSeen, Instant.now()).toMinutes() >= 10)
 			{
-				AircraftState a    = visible.get(y);
-				String        hdg  = a.heading != null ? String.format("%3d°", a.heading) : " ---";
-				String        color = altitudeColor(a.altitude);
-
-				info = String.format("  %s%2c%s  %6dft  %4s  %7.4f  %8.4f  %s  %s  %s",
-						color,
-						(char) ('0' + a.tempId),
-						ANSI_RESET,
-						a.altitude  != null ? a.altitude  : 0,
-						hdg,
-						a.latitude  != null ? a.latitude  : 0.0,
-						a.longitude != null ? a.longitude : 0.0,
-						Utils.toHms(a.lastSeen),
-						a.icaoHex,
-						a.callsign
-				);
-
-				if (a.lastSeen != null && Duration.between(a.lastSeen, Instant.now()).toMinutes() >= 10)
-				{
-					airCrafts.remove(a.icaoHex);
-					freeIds.offer(a.tempId);
-				}
+				airCrafts.remove(a.icaoHex);
+				freeIds.offer(a.tempId);
 			}
-
-			System.out.println(mapRow + info);
 		}
 	}
 
@@ -242,8 +233,8 @@ public class TerminalRenderer implements Runnable
 	private void drawBeamLine(int[][] sweepIntensity, int center, double angleDeg, int intensity)
 	{
 		double rad  = Math.toRadians(angleDeg);
-		int    endX = center + (int) (Math.sin(rad) * (size / 2.0 - 1));
-		int    endY = center - (int) (Math.cos(rad) * (size / 2.0 - 1));
+		int    endX = center + (int) (Math.sin(rad) * (center - 1));
+		int    endY = center - (int) (Math.cos(rad) * (center - 1));
 
 		int x0 = center, y0 = center;
 		int x1 = endX,   y1 = endY;
@@ -253,11 +244,14 @@ public class TerminalRenderer implements Runnable
 		int sx = x0 < x1 ? 1 : -1;
 		int sy = y0 < y1 ? 1 : -1;
 		int err = dx - dy;
-		int max = size - 1;
+		double radius = center - 0.5;
+		final double ASPECT = 0.5;
 
 		while (true)
 		{
-			if (x0 > 0 && x0 < max && y0 > 0 && y0 < max)
+			double ddx = (x0 - center) * ASPECT;
+			double ddy = y0 - center;
+			if (ddx * ddx + ddy * ddy < radius * radius)
 			{
 				// Keep highest intensity if multiple trail lines overlap
 				if (intensity > sweepIntensity[y0][x0])
@@ -288,7 +282,7 @@ public class TerminalRenderer implements Runnable
 			{
 				int rows    = Integer.parseInt(parts[0]);
 				int cols    = Integer.parseInt(parts[1]);
-				int gridDim = Math.min(rows - 2, cols - SIDEBAR_WIDTH);
+				int gridDim = Math.min(rows - 2, cols);
 				return Math.max(10, Math.min(gridDim, 200));
 			}
 		}

@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class App
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
 		Configuration configuration = new Configuration();
 
@@ -27,11 +27,13 @@ public class App
 
 		MessageReceiver messageReceiver = new MessageReceiver(aircrafts, freeIds, configuration, dbQueue);
 		TerminalRenderer terminalRenderer = new TerminalRenderer(aircrafts, configuration, freeIds);
+		DataWriter dataWriter = new DataWriter(aircrafts, freeIds);
 		DbWriter dbWriter = new DbWriter(dbQueue);
 
 		Thread dbWriterThread = new Thread(dbWriter);
 		Thread recieverThread = new Thread(messageReceiver);
 		Thread terminalRendererThread = new Thread(terminalRenderer);
+		Thread dataWriterThread = new Thread(dataWriter);
 
 		if (!configuration.getSearchedAircraft().equals("none"))
 		{
@@ -39,6 +41,7 @@ public class App
 		}
 		recieverThread.start();
 		terminalRendererThread.start();
+		dataWriterThread.start();
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			System.out.println("Shutting down database writer...");
