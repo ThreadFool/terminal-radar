@@ -37,7 +37,7 @@ Run the app:
 
 While the radar is running, open a second terminal and run:
 ```bash
-watch -n 0.5 cat /tmp/radar-data.txt
+watch -c -n 0.5 cat /tmp/radar-data.txt
 ```
 
 This shows a live table (refreshed every 0.5s) with callsigns, ICAO hex codes, altitude, heading, and position for all tracked aircraft. The ID column matches the number shown on the radar dot.
