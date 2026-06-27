@@ -43,7 +43,7 @@ watch -c -n 0.5 cat /tmp/radar-data.txt
 This shows a live table (refreshed every 0.5s) with callsigns, ICAO hex codes, altitude, heading, and position for all tracked aircraft. The ID column matches the number shown on the radar dot.
 
 ## This is what you should be able to see:
-[<img src="radar_view.png" width="500"/>](image.png)
+[<img src="terminal-view.png" width="500"/>](image.png)
 
 ## Testing 
 
